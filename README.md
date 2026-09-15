@@ -1,3 +1,72 @@
 # SpiritAshCompanion Reforged
 
-Initial repository setup. Full v3.8.5 sources, binaries, configuration and development notes are being committed in the next commit.
+DLL-мод для Elden Ring Reforged, который автоматически призывает выбранный Spirit Ash как постоянного компаньона, поддерживает Reforged Fury и умеет догонять игрока/проходить за ним через туманные стены без постоянных тяжёлых сканов.
+
+Текущая стабильная версия: **v3.8.5 DIRECT CATCH-UP FALLBACK**.
+
+## Возможности
+
+- автоматический призыв выбранного духа после загрузки мира;
+- автоматический респавн после реальной потери компаньона;
+- четыре переключаемых пресета;
+- Reforged Fury через одноразовый захват `ChrIns` и дальнейший cached rearm раз в 22 секунды;
+- отсутствие постоянного ChrSet/SpEffect-сканирования в нормальном состоянии;
+- ранний штатный catch-up через `SummonBuddyWarpManager`;
+- direct physics catch-up, если дух сильно отстал или остался за туманной стеной;
+- без правки `regulation.bin` на диске.
+
+## Пресеты
+
+Настраиваются в `dist/SpiritAshCompanion_Reforged.ini`:
+
+```ini
+[Companion]
+Preset=0
+```
+
+| Preset | Компаньон | Goods +10 | Runtime NpcParam / заметка |
+|---|---|---:|---|
+| 0 | Cleanrot Knight Finlay +10 | 223010 | ожидаемый 223000; в Reforged runtime может отличаться, поэтому есть fallback-захват единственного non-Torrent buddy |
+| 1 | Jarwight Puppet +10 | 263010 | 100000060 |
+| 2 | Mimic Tear +10 | используется существующий preset pipeline | копия игрока |
+| 3 | Tarnished — Nepheli Loux Puppet +10 | используется существующий preset pipeline | человеческий melee-компаньон |
+
+После изменения `Preset` полностью перезапустите игру.
+
+## Установка
+
+1. Возьмите файлы из `dist/`.
+2. Поместите DLL и INI рядом в папку DLL Reforged, откуда загружаются пользовательские DLL.
+3. Выберите `Preset` в INI.
+4. Запустите Reforged.
+5. Для диагностики используйте `SpiritAshCompanion_Reforged.log` рядом с DLL.
+
+## Что считается стабильным в v3.8.5
+
+- нет периодических зависаний от Fury;
+- Fury применяется после первоначального захвата компаньона и затем обновляется только по закэшированному указателю;
+- обычное сильное отставание лечится catch-up;
+- проверено, что direct catch-up переносит существующего духа к игроку без перепризыва;
+- туманная стена больше не требует нового summon request.
+
+## Важные архитектурные ограничения
+
+Не возвращать в healthy-state loop:
+
+- полный проход по ChrSet каждые несколько сотен миллисекунд;
+- `VirtualQuery` для каждой записи ChrSet;
+- постоянный обход SpecialEffect списка;
+- повторные summon handshake при временном `alive=0` во время warp/transition.
+
+Именно эти подходы раньше давали фризы или циклический перепризывающийся компаньон.
+
+## Структура
+
+- `src/SpiritAshCompanion_Reforged.cpp` — актуальный исходник v3.8.5. В GitHub-версии он включает транспортные `src/parts/*.inc`; вместе это тот же единый translation unit.
+- `dist/SpiritAshCompanion_Reforged.ini` — конфигурация.
+- `docs/DEVELOPMENT_NOTES.md` — подробные технические заметки.
+- `CHANGELOG.md` — история ключевых версий.
+
+## Статус
+
+Текущая ветка считается рабочей базой для дальнейших изменений. Перед любым экспериментом рекомендуется сохранять v3.8.5 как контрольную стабильную версию.
