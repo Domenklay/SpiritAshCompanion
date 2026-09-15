@@ -1,0 +1,66 @@
+name: Release v3.8.5
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/release-v3.8.5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build DLL
+        shell: powershell
+        run: |
+          clang++ --target=x86_64-pc-windows-msvc -fms-extensions -fno-exceptions -fno-rtti -O2 -c src/SpiritAshCompanion_Reforged.cpp -o mod.obj
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          lld-link /dll /entry:DllMain /nodefaultlib /machine:x64 /out:SpiritAshCompanion_Reforged.dll mod.obj kernel32.lib
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Package release
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force release_package | Out-Null
+          Copy-Item SpiritAshCompanion_Reforged.dll release_package/
+          Copy-Item dist/SpiritAshCompanion_Reforged.ini release_package/
+          Copy-Item docs/README_RU_v3.8.5.txt release_package/
+          Compress-Archive -Path release_package/* -DestinationPath SpiritAshCompanion_Reforged_v3.8.5_DIRECT_CATCHUP.zip -Force
+
+      - name: Create GitHub Release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes = @"
+          Stable v3.8.5 DIRECT CATCH-UP.
+
+          Main fixes:
+          - four switchable Spirit Ash presets;
+          - cached Reforged Fury without periodic ChrSet/SpEffect scans;
+          - no-hitch healthy-state monitoring;
+          - catch-up teleport for companions that fall behind;
+          - boss fog recovery without repeated resummoning;
+          - no regulation.bin modification on disk.
+
+          See README.md, CHANGELOG.md and docs/DEVELOPMENT_NOTES.md for details.
+          "@
+          gh release create v3.8.5 `
+            SpiritAshCompanion_Reforged.dll `
+            SpiritAshCompanion_Reforged_v3.8.5_DIRECT_CATCHUP.zip `
+            --repo $env:GITHUB_REPOSITORY `
+            --target $env:GITHUB_SHA `
+            --title "SpiritAshCompanion Reforged v3.8.5" `
+            --notes $notes
