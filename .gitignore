@@ -1,0 +1,6 @@
+*.log
+*.pdb
+*.obj
+*.ilk
+.vs/
+build/
