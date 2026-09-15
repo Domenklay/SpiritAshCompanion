@@ -27,7 +27,22 @@ jobs:
         run: |
           clang++ --target=x86_64-pc-windows-msvc -fms-extensions -fno-exceptions -fno-rtti -O2 -c src/SpiritAshCompanion_Reforged.cpp -o mod.obj
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          lld-link /dll /entry:DllMain /nodefaultlib /machine:x64 /out:SpiritAshCompanion_Reforged.dll mod.obj kernel32.lib
+
+          @'
+          extern "C" __declspec(noinline) __attribute__((optnone)) void* memmove(void* dst,const void* src,unsigned long long n) {
+              volatile unsigned char* d=(volatile unsigned char*)dst;
+              const volatile unsigned char* s=(const volatile unsigned char*)src;
+              if(d==s || n==0) return dst;
+              if(d<s) { for(unsigned long long i=0;i<n;++i) d[i]=s[i]; }
+              else { for(unsigned long long i=n;i>0;--i) d[i-1]=s[i-1]; }
+              return dst;
+          }
+          '@ | Set-Content -Encoding ASCII memmove_shim.cpp
+
+          clang++ --target=x86_64-pc-windows-msvc -fms-extensions -fno-exceptions -fno-rtti -O0 -fno-builtin-memmove -c memmove_shim.cpp -o memmove_shim.obj
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          lld-link /dll /entry:DllMain /nodefaultlib /machine:x64 /out:SpiritAshCompanion_Reforged.dll mod.obj memmove_shim.obj kernel32.lib
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Package release
