@@ -1,0 +1,5 @@
+# Stable v3.8.5 local release artifacts
+# Raw DLL/ZIP upload is not supported by the current GitHub connector file transport.
+
+4c6982272d5f92921fdb458c4260cf472583930e03fff240fb0fee7a5dcce64c  SpiritAshCompanion_Reforged.dll
+1dc347ecb200f52a5590876224ec58e8ddb62d2ef9999fdd489601d65ef94fe9  SpiritAshCompanion_Reforged_v3.8.5_DIRECT_CATCHUP.zip
