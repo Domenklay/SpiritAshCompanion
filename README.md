@@ -35,11 +35,13 @@ Preset=0
 
 ## Установка
 
-1. Возьмите файлы из `dist/`.
+1. Используйте стабильную DLL v3.8.5 и `dist/SpiritAshCompanion_Reforged.ini`.
 2. Поместите DLL и INI рядом в папку DLL Reforged, откуда загружаются пользовательские DLL.
 3. Выберите `Preset` в INI.
 4. Запустите Reforged.
 5. Для диагностики используйте `SpiritAshCompanion_Reforged.log` рядом с DLL.
+
+> Примечание: текущий GitHub-коннектор, которым репозиторий был заполнен, не умеет передавать локальные raw binary-файлы в GitHub. Поэтому исходник, конфигурация и вся документация находятся в репозитории, а контрольные SHA-256 готовой DLL/ZIP записаны в `releases/SHA256SUMS.txt` и `docs/BUILD_NOTES.md`.
 
 ## Что считается стабильным в v3.8.5
 
@@ -65,6 +67,8 @@ Preset=0
 - `src/SpiritAshCompanion_Reforged.cpp` — актуальный исходник v3.8.5. В GitHub-версии он включает транспортные `src/parts/*.inc`; вместе это тот же единый translation unit.
 - `dist/SpiritAshCompanion_Reforged.ini` — конфигурация.
 - `docs/DEVELOPMENT_NOTES.md` — подробные технические заметки.
+- `docs/BUILD_NOTES.md` — заметки по сборке и контрольные хэши.
+- `releases/SHA256SUMS.txt` — SHA-256 стабильной DLL и ZIP.
 - `CHANGELOG.md` — история ключевых версий.
 
 ## Статус
