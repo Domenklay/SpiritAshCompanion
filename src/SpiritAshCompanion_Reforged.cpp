@@ -1,0 +1,11 @@
+// Split only for GitHub connector transport. The compiler sees the original source as one translation unit.
+#include "parts/part_00.inc"
+#include "parts/part_01.inc"
+#include "parts/part_02.inc"
+#include "parts/part_03.inc"
+#include "parts/part_04.inc"
+#include "parts/part_05.inc"
+#include "parts/part_06.inc"
+#include "parts/part_07.inc"
+#include "parts/part_08.inc"
+#include "parts/part_09.inc"
